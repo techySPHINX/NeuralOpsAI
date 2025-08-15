@@ -11,4 +11,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8080
-  type: LoadBalancer # Use LoadBalancer for external access, or ClusterIP for internal only
+  type: LoadBalancer # LoadBalancer for external access, or ClusterIP for internal only

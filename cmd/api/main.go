@@ -1,12 +1,23 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+
+	"neuralops/internal/argo"
 )
 
+var argoClient *argo.Client
+
 func main() {
+	var err error
+	argoClient, err = argo.NewClient("argo") // Assuming Argo Workflows is in 'argo' namespace
+	if err != nil {
+		log.Fatalf("Failed to create Argo client: %v", err)
+	}
+
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/trigger-workflow", triggerWorkflowHandler)
 	port := "8080"
@@ -19,6 +30,19 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func triggerWorkflowHandler(w http.ResponseWriter, r *http.Request) {
-	// Placeholder for Argo Workflow triggering logic
-	fmt.Fprintf(w, "Triggering Argo Workflow (placeholder)...")
+	// In a real scenario, you would load the workflow from a YAML file.
+	// For now, we are using the dummy workflow from internal/argo/client.go
+	workflow, err := argo.LoadWorkflowFromYAML("workflows/hello-world-workflow.yaml") // Placeholder path
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to load workflow: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = argoClient.SubmitWorkflow(context.Background(), workflow)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to submit workflow: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, "Argo Workflow submitted successfully!")
 }

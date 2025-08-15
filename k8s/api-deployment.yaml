@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neuralops-api-gateway
+  labels:
+    app: neuralops-api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neuralops-api-gateway
+  template:
+    metadata:
+      labels:
+        app: neuralops-api-gateway
+    spec:
+      containers:
+      - name: neuralops-api-gateway
+        image: neuralops-api-gateway:latest
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: Never # Use Never for local development with locally built images

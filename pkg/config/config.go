@@ -18,6 +18,7 @@ type AppConfig struct {
 	MinIOAccessKey   string
 	MinIOSecretKey   string
 	NessieEndpoint   string
+	PrometheusAddr   string
 }
 
 // Load loads the configuration from environment variables.
@@ -33,6 +34,7 @@ func Load() (*AppConfig, error) {
 	minioAccessKey := getEnv("MINIO_ACCESS_KEY", "minioadmin")
 	minioSecretKey := getEnv("MINIO_SECRET_KEY", "minioadmin")
 	nessieEndpoint := getEnv("NESSIE_ENDPOINT", "http://localhost:19120/api/v1")
+	prometheusAddr := getEnv("PROMETHEUS_ADDR", "http://localhost:9090") // Default Prometheus address
 
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
@@ -51,6 +53,7 @@ func Load() (*AppConfig, error) {
 		MinIOAccessKey:   minioAccessKey,
 		MinIOSecretKey:   minioSecretKey,
 		NessieEndpoint:   nessieEndpoint,
+		PrometheusAddr:   prometheusAddr,
 	}, nil
 }
 

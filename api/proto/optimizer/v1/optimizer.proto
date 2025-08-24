@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package optimizer.v1;
+
+option go_package = "neuralops/api/proto/optimizer/v1;optimizerv1";
+
+service OptimizerService {
+  rpc Optimize(OptimizeRequest) returns (OptimizeResponse) {}
+}
+
+message OptimizeRequest {
+  string deployment_name = 1;
+  string namespace = 2;
+  // Add other parameters like duration for metrics, etc.
+}
+
+message OptimizeResponse {
+  bool success = 1;
+  string message = 2;
+  // Recommended resources could be added here
+  map<string, string> recommended_cpu = 3;
+  map<string, string> recommended_memory = 4;
+}

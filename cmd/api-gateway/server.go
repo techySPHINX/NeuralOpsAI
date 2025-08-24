@@ -9,20 +9,23 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"neuralops/api/proto/ai_engine/v1"
+	"neuralops/api/proto/orchestrator/v1"
 	"neuralops/pkg/logging"
 )
 
 type Server struct {
-	router    *chi.Mux
-	logger    *logging.Logger
-	aiClient  ai_enginev1.AIEngineServiceClient
+	router           *chi.Mux
+	logger           *logging.Logger
+	aiClient         ai_enginev1.AIEngineServiceClient
+	orchestratorClient orchestratorv1.OrchestratorServiceClient
 }
 
-func NewServer(logger *logging.Logger, aiClient ai_enginev1.AIEngineServiceClient) *Server {
+func NewServer(logger *logging.Logger, aiClient ai_enginev1.AIEngineServiceClient, orchestratorClient orchestratorv1.OrchestratorServiceClient) *Server {
 	s := &Server{
-		router:    chi.NewRouter(),
-		logger:    logger,
-		aiClient:  aiClient,
+		router:           chi.NewRouter(),
+		logger:           logger,
+		aiClient:         aiClient,
+		orchestratorClient: orchestratorClient,
 	}
 
 	s.router.Use(middleware.RequestID)
@@ -77,14 +80,18 @@ func (s *Server) handleCreatePipelineFromNL() http.HandlerFunc {
 
 		s.logger.Info("Received plan from AI engine", "plan_id", planResp.Plan.Id)
 
-		// In a future step, we will send this plan to the orchestrator.
-		// For now, just return a success message.
+		submitResp, err := s.orchestratorClient.SubmitPipeline(context.Background(), &orchestratorv1.SubmitPipelineRequest{Plan: planResp.Plan})
+		if err != nil {
+			s.logger.Error("failed to submit pipeline to orchestrator", "error", err)
+			http.Error(w, "failed to submit pipeline", http.StatusInternalServerError)
+			return
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusAccepted)
 		json.NewEncoder(w).Encode(map[string]string{
-			"message": "pipeline plan created successfully",
-			"plan_id": planResp.Plan.Id,
+			"message": "pipeline submitted successfully",
+			"run_id":  submitResp.RunId,
 		})
 	}
 }

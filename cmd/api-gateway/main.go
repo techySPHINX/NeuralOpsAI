@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"neuralops/api/proto/ai_engine/v1"
+	"neuralops/api/proto/orchestrator/v1"
 	"neuralops/pkg/config"
 	"neuralops/pkg/logging"
 	"go.uber.org/zap"
@@ -26,14 +27,22 @@ func main() {
 	logger.Info("Starting API Gateway...")
 
 	// Set up gRPC client connection to AI Engine
-	conn, err := grpc.Dial(cfg.AIEngineAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	aiConn, err := grpc.Dial(cfg.AIEngineAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal("failed to connect to AI engine", zap.Error(err))
 	}
-	defer conn.Close()
-	aiClient := ai_enginev1.NewAIEngineServiceClient(conn)
+	defer aiConn.Close()
+	aiClient := ai_enginev1.NewAIEngineServiceClient(aiConn)
 
-	server := NewServer(logger, aiClient)
+	// Set up gRPC client connection to Orchestrator
+	orcConn, err := grpc.Dial(cfg.OrchestratorAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Fatal("failed to connect to orchestrator", zap.Error(err))
+	}
+	defer orcConn.Close()
+	orchestratorClient := orchestratorv1.NewOrchestratorServiceClient(orcConn)
+
+	server := NewServer(logger, aiClient, orchestratorClient)
 
 	addr := fmt.Sprintf(":%d", cfg.Port)
 	logger.Info("Server listening on", zap.String("addr", addr))

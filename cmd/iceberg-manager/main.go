@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"context"
 
 	"google.golang.org/grpc"
 	"neuralops/api/proto/iceberg/v1"
+	"neuralops/pkg/clients"
 	"neuralops/pkg/config"
 	"neuralops/pkg/logging"
 	"go.uber.org/zap"
@@ -25,7 +27,20 @@ func main() {
 
 	logger.Info("Starting Iceberg Manager...")
 
-	// TODO: Initialize MinIO and Nessie clients
+	// Initialize MinIO client
+	minioClient, err := clients.NewMinIOClient(
+		cfg.MinIOEndpoint,
+		cfg.MinIOAccessKey,
+		cfg.MinIOSecretKey,
+		false, // Use SSL
+		"iceberg-data", // Default bucket name
+	)
+	if err != nil {
+		logger.Fatal("failed to create MinIO client", zap.Error(err))
+	}
+
+	// Initialize Nessie client
+	nessieClient := clients.NewNessieClient(cfg.NessieEndpoint)
 
 	// Start gRPC server in a goroutine
 	go func() {
@@ -36,7 +51,7 @@ func main() {
 			logger.Fatal("failed to listen", zap.Error(err))
 		}
 		grpcServer := grpc.NewServer()
-		icebergv1.RegisterIcebergServiceServer(grpcServer, NewIcebergGRPCServer(logger))
+		icebergv1.RegisterIcebergServiceServer(grpcServer, NewIcebergGRPCServer(logger, minioClient, nessieClient))
 		logger.Info("gRPC server listening on", zap.String("addr", grpcAddr))
 		if err := grpcServer.Serve(lis); err != nil {
 			logger.Fatal("failed to serve gRPC", zap.Error(err))

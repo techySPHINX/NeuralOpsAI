@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
 
 	"google.golang.org/grpc"
 	"neuralops/api/proto/optimizer/v1"
+	"neuralops/pkg/clients"
 	"neuralops/pkg/config"
 	"neuralops/pkg/logging"
 	"go.uber.org/zap"
@@ -25,7 +27,24 @@ func main() {
 
 	logger.Info("Starting Resource Optimizer...")
 
-	// TODO: Initialize Prometheus client, Helm client, K8s client
+	// Initialize Prometheus client
+	prometheusClient, err := clients.NewPrometheusClient(cfg.PrometheusAddr)
+	if err != nil {
+		logger.Fatal("failed to create Prometheus client", zap.Error(err))
+	}
+
+	// Initialize Kubernetes client
+	kubernetesClient, err := clients.NewKubernetesClient()
+	if err != nil {
+		logger.Fatal("failed to create Kubernetes client", zap.Error(err))
+	}
+
+	// Initialize Helm client
+	// Helm client needs a namespace. For simplicity, using "default" for now.
+	helmClient, err := clients.NewHelmClient("default")
+	if err != nil {
+		logger.Fatal("failed to create Helm client", zap.Error(err))
+	}
 
 	// Start gRPC server in a goroutine
 	go func() {
@@ -36,7 +55,7 @@ func main() {
 			logger.Fatal("failed to listen", zap.Error(err))
 		}
 		grpcServer := grpc.NewServer()
-		optimizerv1.RegisterOptimizerServiceServer(grpcServer, NewOptimizerGRPCServer(logger))
+		optimizerv1.RegisterOptimizerServiceServer(grpcServer, NewOptimizerGRPCServer(logger, prometheusClient, kubernetesClient, helmClient))
 		logger.Info("gRPC server listening on", zap.String("addr", grpcAddr))
 		if err := grpcServer.Serve(lis); err != nil {
 			logger.Fatal("failed to serve gRPC", zap.Error(err))

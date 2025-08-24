@@ -8,6 +8,7 @@ option go_package = "neuralops/api/proto/ai_engine/v1;ai_enginev1";
 
 service AIEngineService {
   rpc Plan(PlanRequest) returns (PlanResponse) {}
+  rpc PlanAndCodegen(PlanAndCodegenRequest) returns (PlanAndCodegenResponse) {}
 }
 
 message PlanRequest {
@@ -16,4 +17,13 @@ message PlanRequest {
 
 message PlanResponse {
   PipelinePlan plan = 1;
+}
+
+message PlanAndCodegenRequest {
+  string query = 1;
+}
+
+message PlanAndCodegenResponse {
+  PipelinePlan plan = 1;
+  map<string, string> task_code = 2; // map of task name to generated code
 }

@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AIEngineService_Plan_FullMethodName = "/ai_engine.v1.AIEngineService/Plan"
+	AIEngineService_Plan_FullMethodName           = "/ai_engine.v1.AIEngineService/Plan"
+	AIEngineService_PlanAndCodegen_FullMethodName = "/ai_engine.v1.AIEngineService/PlanAndCodegen"
 )
 
 // AIEngineServiceClient is the client API for AIEngineService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AIEngineServiceClient interface {
 	Plan(ctx context.Context, in *PlanRequest, opts ...grpc.CallOption) (*PlanResponse, error)
+	PlanAndCodegen(ctx context.Context, in *PlanAndCodegenRequest, opts ...grpc.CallOption) (*PlanAndCodegenResponse, error)
 }
 
 type aIEngineServiceClient struct {
@@ -47,11 +49,22 @@ func (c *aIEngineServiceClient) Plan(ctx context.Context, in *PlanRequest, opts 
 	return out, nil
 }
 
+func (c *aIEngineServiceClient) PlanAndCodegen(ctx context.Context, in *PlanAndCodegenRequest, opts ...grpc.CallOption) (*PlanAndCodegenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PlanAndCodegenResponse)
+	err := c.cc.Invoke(ctx, AIEngineService_PlanAndCodegen_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AIEngineServiceServer is the server API for AIEngineService service.
 // All implementations must embed UnimplementedAIEngineServiceServer
 // for forward compatibility.
 type AIEngineServiceServer interface {
 	Plan(context.Context, *PlanRequest) (*PlanResponse, error)
+	PlanAndCodegen(context.Context, *PlanAndCodegenRequest) (*PlanAndCodegenResponse, error)
 	mustEmbedUnimplementedAIEngineServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedAIEngineServiceServer struct{}
 
 func (UnimplementedAIEngineServiceServer) Plan(context.Context, *PlanRequest) (*PlanResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Plan not implemented")
+}
+func (UnimplementedAIEngineServiceServer) PlanAndCodegen(context.Context, *PlanAndCodegenRequest) (*PlanAndCodegenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PlanAndCodegen not implemented")
 }
 func (UnimplementedAIEngineServiceServer) mustEmbedUnimplementedAIEngineServiceServer() {}
 func (UnimplementedAIEngineServiceServer) testEmbeddedByValue()                         {}
@@ -104,6 +120,24 @@ func _AIEngineService_Plan_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AIEngineService_PlanAndCodegen_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PlanAndCodegenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AIEngineServiceServer).PlanAndCodegen(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AIEngineService_PlanAndCodegen_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AIEngineServiceServer).PlanAndCodegen(ctx, req.(*PlanAndCodegenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AIEngineService_ServiceDesc is the grpc.ServiceDesc for AIEngineService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var AIEngineService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Plan",
 			Handler:    _AIEngineService_Plan_Handler,
+		},
+		{
+			MethodName: "PlanAndCodegen",
+			Handler:    _AIEngineService_PlanAndCodegen_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

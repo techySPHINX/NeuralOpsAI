@@ -71,7 +71,7 @@ func (s *Server) handleCreatePipelineFromNL() http.HandlerFunc {
 			return
 		}
 
-		planResp, err := s.aiClient.Plan(context.Background(), &ai_enginev1.PlanRequest{Query: req.Query})
+		planResp, err := s.aiClient.PlanAndCodegen(context.Background(), &ai_enginev1.PlanAndCodegenRequest{Query: req.Query})
 		if err != nil {
 			s.logger.Error("failed to get plan from AI engine", "error", err)
 			http.Error(w, "failed to create plan", http.StatusInternalServerError)
@@ -80,7 +80,10 @@ func (s *Server) handleCreatePipelineFromNL() http.HandlerFunc {
 
 		s.logger.Info("Received plan from AI engine", "plan_id", planResp.Plan.Id)
 
-		submitResp, err := s.orchestratorClient.SubmitPipeline(context.Background(), &orchestratorv1.SubmitPipelineRequest{Plan: planResp.Plan})
+		submitResp, err := s.orchestratorClient.SubmitPipeline(context.Background(), &orchestratorv1.SubmitPipelineRequest{
+			Plan:     planResp.Plan,
+			TaskCode: planResp.TaskCode,
+		})
 		if err != nil {
 			s.logger.Error("failed to submit pipeline to orchestrator", "error", err)
 			http.Error(w, "failed to submit pipeline", http.StatusInternalServerError)

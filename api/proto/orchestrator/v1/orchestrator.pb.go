@@ -25,6 +25,7 @@ const (
 type SubmitPipelineRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Plan          *v1.PipelinePlan       `protobuf:"bytes,1,opt,name=plan,proto3" json:"plan,omitempty"`
+	TaskCode      map[string]string      `protobuf:"bytes,2,rep,name=task_code,json=taskCode,proto3" json:"task_code,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // map of task name to generated code
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -62,6 +63,13 @@ func (*SubmitPipelineRequest) Descriptor() ([]byte, []int) {
 func (x *SubmitPipelineRequest) GetPlan() *v1.PipelinePlan {
 	if x != nil {
 		return x.Plan
+	}
+	return nil
+}
+
+func (x *SubmitPipelineRequest) GetTaskCode() map[string]string {
+	if x != nil {
+		return x.TaskCode
 	}
 	return nil
 }
@@ -114,9 +122,13 @@ var File_orchestrator_v1_orchestrator_proto protoreflect.FileDescriptor
 
 const file_orchestrator_v1_orchestrator_proto_rawDesc = "" +
 	"\n" +
-	"\"orchestrator/v1/orchestrator.proto\x12\x0forchestrator.v1\x1a\x1bai_engine/v1/pipeline.proto\"G\n" +
+	"\"orchestrator/v1/orchestrator.proto\x12\x0forchestrator.v1\x1a\x1bai_engine/v1/pipeline.proto\"\xd7\x01\n" +
 	"\x15SubmitPipelineRequest\x12.\n" +
-	"\x04plan\x18\x01 \x01(\v2\x1a.ai_engine.v1.PipelinePlanR\x04plan\"/\n" +
+	"\x04plan\x18\x01 \x01(\v2\x1a.ai_engine.v1.PipelinePlanR\x04plan\x12Q\n" +
+	"\ttask_code\x18\x02 \x03(\v24.orchestrator.v1.SubmitPipelineRequest.TaskCodeEntryR\btaskCode\x1a;\n" +
+	"\rTaskCodeEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"/\n" +
 	"\x16SubmitPipelineResponse\x12\x15\n" +
 	"\x06run_id\x18\x01 \x01(\tR\x05runId2z\n" +
 	"\x13OrchestratorService\x12c\n" +
@@ -134,21 +146,23 @@ func file_orchestrator_v1_orchestrator_proto_rawDescGZIP() []byte {
 	return file_orchestrator_v1_orchestrator_proto_rawDescData
 }
 
-var file_orchestrator_v1_orchestrator_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_orchestrator_v1_orchestrator_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_orchestrator_v1_orchestrator_proto_goTypes = []any{
 	(*SubmitPipelineRequest)(nil),  // 0: orchestrator.v1.SubmitPipelineRequest
 	(*SubmitPipelineResponse)(nil), // 1: orchestrator.v1.SubmitPipelineResponse
-	(*v1.PipelinePlan)(nil),        // 2: ai_engine.v1.PipelinePlan
+	nil,                            // 2: orchestrator.v1.SubmitPipelineRequest.TaskCodeEntry
+	(*v1.PipelinePlan)(nil),        // 3: ai_engine.v1.PipelinePlan
 }
 var file_orchestrator_v1_orchestrator_proto_depIdxs = []int32{
-	2, // 0: orchestrator.v1.SubmitPipelineRequest.plan:type_name -> ai_engine.v1.PipelinePlan
-	0, // 1: orchestrator.v1.OrchestratorService.SubmitPipeline:input_type -> orchestrator.v1.SubmitPipelineRequest
-	1, // 2: orchestrator.v1.OrchestratorService.SubmitPipeline:output_type -> orchestrator.v1.SubmitPipelineResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	3, // 0: orchestrator.v1.SubmitPipelineRequest.plan:type_name -> ai_engine.v1.PipelinePlan
+	2, // 1: orchestrator.v1.SubmitPipelineRequest.task_code:type_name -> orchestrator.v1.SubmitPipelineRequest.TaskCodeEntry
+	0, // 2: orchestrator.v1.OrchestratorService.SubmitPipeline:input_type -> orchestrator.v1.SubmitPipelineRequest
+	1, // 3: orchestrator.v1.OrchestratorService.SubmitPipeline:output_type -> orchestrator.v1.SubmitPipelineResponse
+	3, // [3:4] is the sub-list for method output_type
+	2, // [2:3] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_orchestrator_v1_orchestrator_proto_init() }
@@ -162,7 +176,7 @@ func file_orchestrator_v1_orchestrator_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_orchestrator_v1_orchestrator_proto_rawDesc), len(file_orchestrator_v1_orchestrator_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

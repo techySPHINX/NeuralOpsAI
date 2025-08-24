@@ -12,6 +12,7 @@ service OrchestratorService {
 
 message SubmitPipelineRequest {
   ai_engine.v1.PipelinePlan plan = 1;
+  map<string, string> task_code = 2; // map of task name to generated code
 }
 
 message SubmitPipelineResponse {

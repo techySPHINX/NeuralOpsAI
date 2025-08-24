@@ -109,6 +109,102 @@ func (x *PlanResponse) GetPlan() *PipelinePlan {
 	return nil
 }
 
+type PlanAndCodegenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PlanAndCodegenRequest) Reset() {
+	*x = PlanAndCodegenRequest{}
+	mi := &file_ai_engine_v1_ai_engine_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PlanAndCodegenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlanAndCodegenRequest) ProtoMessage() {}
+
+func (x *PlanAndCodegenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_engine_v1_ai_engine_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlanAndCodegenRequest.ProtoReflect.Descriptor instead.
+func (*PlanAndCodegenRequest) Descriptor() ([]byte, []int) {
+	return file_ai_engine_v1_ai_engine_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *PlanAndCodegenRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+type PlanAndCodegenResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Plan          *PipelinePlan          `protobuf:"bytes,1,opt,name=plan,proto3" json:"plan,omitempty"`
+	TaskCode      map[string]string      `protobuf:"bytes,2,rep,name=task_code,json=taskCode,proto3" json:"task_code,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // map of task name to generated code
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PlanAndCodegenResponse) Reset() {
+	*x = PlanAndCodegenResponse{}
+	mi := &file_ai_engine_v1_ai_engine_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PlanAndCodegenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlanAndCodegenResponse) ProtoMessage() {}
+
+func (x *PlanAndCodegenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ai_engine_v1_ai_engine_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlanAndCodegenResponse.ProtoReflect.Descriptor instead.
+func (*PlanAndCodegenResponse) Descriptor() ([]byte, []int) {
+	return file_ai_engine_v1_ai_engine_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *PlanAndCodegenResponse) GetPlan() *PipelinePlan {
+	if x != nil {
+		return x.Plan
+	}
+	return nil
+}
+
+func (x *PlanAndCodegenResponse) GetTaskCode() map[string]string {
+	if x != nil {
+		return x.TaskCode
+	}
+	return nil
+}
+
 var File_ai_engine_v1_ai_engine_proto protoreflect.FileDescriptor
 
 const file_ai_engine_v1_ai_engine_proto_rawDesc = "" +
@@ -117,9 +213,18 @@ const file_ai_engine_v1_ai_engine_proto_rawDesc = "" +
 	"\vPlanRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\">\n" +
 	"\fPlanResponse\x12.\n" +
-	"\x04plan\x18\x01 \x01(\v2\x1a.ai_engine.v1.PipelinePlanR\x04plan2R\n" +
+	"\x04plan\x18\x01 \x01(\v2\x1a.ai_engine.v1.PipelinePlanR\x04plan\"-\n" +
+	"\x15PlanAndCodegenRequest\x12\x14\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\"\xd6\x01\n" +
+	"\x16PlanAndCodegenResponse\x12.\n" +
+	"\x04plan\x18\x01 \x01(\v2\x1a.ai_engine.v1.PipelinePlanR\x04plan\x12O\n" +
+	"\ttask_code\x18\x02 \x03(\v22.ai_engine.v1.PlanAndCodegenResponse.TaskCodeEntryR\btaskCode\x1a;\n" +
+	"\rTaskCodeEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xb1\x01\n" +
 	"\x0fAIEngineService\x12?\n" +
-	"\x04Plan\x12\x19.ai_engine.v1.PlanRequest\x1a\x1a.ai_engine.v1.PlanResponse\"\x00B.Z,neuralops/api/proto/ai_engine/v1;ai_enginev1b\x06proto3"
+	"\x04Plan\x12\x19.ai_engine.v1.PlanRequest\x1a\x1a.ai_engine.v1.PlanResponse\"\x00\x12]\n" +
+	"\x0ePlanAndCodegen\x12#.ai_engine.v1.PlanAndCodegenRequest\x1a$.ai_engine.v1.PlanAndCodegenResponse\"\x00B.Z,neuralops/api/proto/ai_engine/v1;ai_enginev1b\x06proto3"
 
 var (
 	file_ai_engine_v1_ai_engine_proto_rawDescOnce sync.Once
@@ -133,21 +238,28 @@ func file_ai_engine_v1_ai_engine_proto_rawDescGZIP() []byte {
 	return file_ai_engine_v1_ai_engine_proto_rawDescData
 }
 
-var file_ai_engine_v1_ai_engine_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_ai_engine_v1_ai_engine_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_ai_engine_v1_ai_engine_proto_goTypes = []any{
-	(*PlanRequest)(nil),  // 0: ai_engine.v1.PlanRequest
-	(*PlanResponse)(nil), // 1: ai_engine.v1.PlanResponse
-	(*PipelinePlan)(nil), // 2: ai_engine.v1.PipelinePlan
+	(*PlanRequest)(nil),            // 0: ai_engine.v1.PlanRequest
+	(*PlanResponse)(nil),           // 1: ai_engine.v1.PlanResponse
+	(*PlanAndCodegenRequest)(nil),  // 2: ai_engine.v1.PlanAndCodegenRequest
+	(*PlanAndCodegenResponse)(nil), // 3: ai_engine.v1.PlanAndCodegenResponse
+	nil,                            // 4: ai_engine.v1.PlanAndCodegenResponse.TaskCodeEntry
+	(*PipelinePlan)(nil),           // 5: ai_engine.v1.PipelinePlan
 }
 var file_ai_engine_v1_ai_engine_proto_depIdxs = []int32{
-	2, // 0: ai_engine.v1.PlanResponse.plan:type_name -> ai_engine.v1.PipelinePlan
-	0, // 1: ai_engine.v1.AIEngineService.Plan:input_type -> ai_engine.v1.PlanRequest
-	1, // 2: ai_engine.v1.AIEngineService.Plan:output_type -> ai_engine.v1.PlanResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	5, // 0: ai_engine.v1.PlanResponse.plan:type_name -> ai_engine.v1.PipelinePlan
+	5, // 1: ai_engine.v1.PlanAndCodegenResponse.plan:type_name -> ai_engine.v1.PipelinePlan
+	4, // 2: ai_engine.v1.PlanAndCodegenResponse.task_code:type_name -> ai_engine.v1.PlanAndCodegenResponse.TaskCodeEntry
+	0, // 3: ai_engine.v1.AIEngineService.Plan:input_type -> ai_engine.v1.PlanRequest
+	2, // 4: ai_engine.v1.AIEngineService.PlanAndCodegen:input_type -> ai_engine.v1.PlanAndCodegenRequest
+	1, // 5: ai_engine.v1.AIEngineService.Plan:output_type -> ai_engine.v1.PlanResponse
+	3, // 6: ai_engine.v1.AIEngineService.PlanAndCodegen:output_type -> ai_engine.v1.PlanAndCodegenResponse
+	5, // [5:7] is the sub-list for method output_type
+	3, // [3:5] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_ai_engine_v1_ai_engine_proto_init() }
@@ -162,7 +274,7 @@ func file_ai_engine_v1_ai_engine_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ai_engine_v1_ai_engine_proto_rawDesc), len(file_ai_engine_v1_ai_engine_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

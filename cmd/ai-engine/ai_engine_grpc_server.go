@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"neuralops/api/proto/ai_engine/v1"
+	"neuralops/internal/codegen"
 	"neuralops/llm/adapters"
 	"neuralops/pkg/logging"
 )
@@ -31,4 +32,32 @@ func (s *AIEngineGRPCServer) Plan(ctx context.Context, req *ai_enginev1.PlanRequ
 	}
 
 	return &ai_enginev1.PlanResponse{Plan: plan}, nil
+}
+
+func (s *AIEngineGRPCServer) PlanAndCodegen(ctx context.Context, req *ai_enginev1.PlanAndCodegenRequest) (*ai_enginev1.PlanAndCodegenResponse, error) {
+	s.logger.Info("Received PlanAndCodegen request", "query", req.Query)
+
+	plan, err := s.adapter.GeneratePlan(ctx, req.Query)
+	if err != nil {
+		s.logger.Error("failed to generate plan", "error", err)
+		return nil, err
+	}
+
+	taskCode := make(map[string]string)
+	for _, task := range plan.Tasks {
+		// For now, only generate code for 'transform' tasks
+		if task.Type == "transform" {
+			code, err := codegen.GenerateGoPlugin(task)
+			if err != nil {
+				s.logger.Error("failed to generate code for task", "task", task.Name, "error", err)
+				return nil, err
+			}
+			taskCode[task.Name] = code
+		}
+	}
+
+	return &ai_enginev1.PlanAndCodegenResponse{
+		Plan:     plan,
+		TaskCode: taskCode,
+	}, nil
 }

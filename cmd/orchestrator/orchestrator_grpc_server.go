@@ -25,7 +25,7 @@ func NewOrchestratorGRPCServer(logger *logging.Logger, argoClient *clients.ArgoC
 func (s *OrchestratorGRPCServer) SubmitPipeline(ctx context.Context, req *orchestratorv1.SubmitPipelineRequest) (*orchestratorv1.SubmitPipelineResponse, error) {
 	s.logger.Info("Received SubmitPipeline request", "plan_id", req.Plan.Id)
 
-	argoWF, err := compiler.CompileToArgo(req.Plan)
+	argoWF, err := compiler.CompileToArgo(req) // Pass the whole request
 	if err != nil {
 		s.logger.Error("failed to compile plan to Argo workflow", "error", err)
 		return nil, err

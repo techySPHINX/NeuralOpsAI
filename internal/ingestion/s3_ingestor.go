@@ -23,7 +23,6 @@ func NewS3Ingestor(endpoint, accessKeyID, secretAccessKey, bucketName string) (*
 		return nil, fmt.Errorf("failed to create minio client: %w", err)
 	}
 
-	// Check if the bucket exists, if not, create it
 	found, err := minioClient.BucketExists(context.Background(), bucketName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check bucket existence: %w", err)

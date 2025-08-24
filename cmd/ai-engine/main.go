@@ -7,6 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 	"neuralops/api/proto/ai_engine/v1"
+	"neuralops/llm/adapters"
 	"neuralops/pkg/config"
 	"neuralops/pkg/logging"
 	"go.uber.org/zap"
@@ -25,6 +26,8 @@ func main() {
 
 	logger.Info("Starting AI Engine...")
 
+	adapter := adapters.NewOpenAIAdapter(cfg.OpenAIAPIKey, cfg.OpenAIEndpoint)
+
 	// Start gRPC server in a goroutine
 	go func() {
 		lis, err := net.Listen("tcp", cfg.AIEngineAddr)
@@ -32,7 +35,7 @@ func main() {
 			logger.Fatal("failed to listen", zap.Error(err))
 		}
 		grpcServer := grpc.NewServer()
-		ai_enginev1.RegisterAIEngineServiceServer(grpcServer, NewAIEngineGRPCServer(logger))
+		ai_enginev1.RegisterAIEngineServiceServer(grpcServer, NewAIEngineGRPCServer(logger, adapter))
 		logger.Info("gRPC server listening on", zap.String("addr", cfg.AIEngineAddr))
 		if err := grpcServer.Serve(lis); err != nil {
 			logger.Fatal("failed to serve gRPC", zap.Error(err))

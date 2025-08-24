@@ -11,6 +11,8 @@ type AppConfig struct {
 	Port             int
 	AIEngineAddr     string
 	OrchestratorAddr string
+	OpenAIAPIKey     string
+	OpenAIEndpoint   string
 }
 
 // Load loads the configuration from environment variables.
@@ -18,7 +20,9 @@ func Load() (*AppConfig, error) {
 	logLevel := getEnv("LOG_LEVEL", "info")
 	portStr := getEnv("PORT", "8080")
 	aiEngineAddr := getEnv("AI_ENGINE_ADDR", "localhost:8081")
-	orchestratorAddr := getEnv("ORCHESTRATOR_ADDR", "localhost:8082") // Default for local dev
+	orchestratorAddr := getEnv("ORCHESTRATOR_ADDR", "localhost:8082")
+	openAIAPIKey := getEnv("OPENAI_API_KEY", "")
+	openAIEndpoint := getEnv("OPENAI_ENDPOINT", "https://api.openai.com/v1/chat/completions")
 
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
@@ -30,6 +34,8 @@ func Load() (*AppConfig, error) {
 		Port:             port,
 		AIEngineAddr:     aiEngineAddr,
 		OrchestratorAddr: orchestratorAddr,
+		OpenAIAPIKey:     openAIAPIKey,
+		OpenAIEndpoint:   openAIEndpoint,
 	}, nil
 }
 

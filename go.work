@@ -1,0 +1,11 @@
+go 1.24.3
+
+use (
+	./cmd/ai-engine
+	./cmd/api-gateway
+	./cmd/iceberg-manager
+	./cmd/incident-responder
+	./cmd/orchestrator
+	./cmd/resource-optimizer
+	./cmd/workflow-runner
+)

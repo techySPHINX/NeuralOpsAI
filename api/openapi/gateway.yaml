@@ -1,0 +1,78 @@
+openapi: 3.0.0
+info:
+  title: NeuralOps API Gateway
+  version: 1.0.0
+paths:
+  /healthz:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+  /v1/pipelines:nl:
+    post:
+      summary: Create a pipeline from a natural language query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /v1/pipelines/{id}:run:
+    post:
+      summary: Run a pipeline
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /v1/runs/{id}:
+    get:
+      summary: Get the status of a run
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Run'
+
+components:
+  schemas:
+    Run:
+      type: object
+      properties:
+        run_id:
+          type: string
+        status:
+          type: string

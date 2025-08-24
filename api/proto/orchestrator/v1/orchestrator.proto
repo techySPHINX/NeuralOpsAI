@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package orchestrator.v1;
+
+import "ai_engine/v1/pipeline.proto";
+
+option go_package = "neuralops/api/proto/orchestrator/v1;orchestratorv1";
+
+service OrchestratorService {
+  rpc SubmitPipeline(SubmitPipelineRequest) returns (SubmitPipelineResponse) {}
+}
+
+message SubmitPipelineRequest {
+  ai_engine.v1.PipelinePlan plan = 1;
+}
+
+message SubmitPipelineResponse {
+  string run_id = 1;
+}

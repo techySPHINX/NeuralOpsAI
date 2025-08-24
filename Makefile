@@ -1,6 +1,12 @@
 
 .PHONY: help dev-tools lint test build docker proto kind-up temporal-up run-gateway
 
+BUF_VERSION=1.28.1
+GOBIN=$(shell go env GOBIN)
+ifeq ($(GOBIN),)
+GOBIN=$(shell go env GOPATH)/bin
+endif
+
 help:
 	@echo "Makefile for NeuralOps"
 	@echo ""
@@ -17,7 +23,9 @@ help:
 
 dev-tools:
 	@echo "Installing development tools..."
-	# Add commands to install tools like buf, helm, etc.
+	@go install github.com/bufbuild/buf/cmd/buf@v$(BUF_VERSION)
+	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 lint:
 	@echo "Linting..."
@@ -37,7 +45,7 @@ docker:
 
 proto:
 	@echo "Generating protobuf files..."
-	# Add protobuf generation commands
+	@cd api/proto && go run github.com/bufbuild/buf/cmd/buf@v$(BUF_VERSION) generate
 
 kind-up:
 	@echo "Starting kind cluster..."

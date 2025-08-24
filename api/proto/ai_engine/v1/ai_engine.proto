@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package ai_engine.v1;
+
+import "ai_engine/v1/pipeline.proto";
+
+option go_package = "neuralops/api/proto/ai_engine/v1;ai_enginev1";
+
+service AIEngineService {
+  rpc Plan(PlanRequest) returns (PlanResponse) {}
+}
+
+message PlanRequest {
+  string query = 1;
+}
+
+message PlanResponse {
+  PipelinePlan plan = 1;
+}

@@ -14,6 +14,10 @@ type AppConfig struct {
 	OpenAIAPIKey     string
 	OpenAIEndpoint   string
 	ArgoServerAddr   string
+	MinIOEndpoint    string
+	MinIOAccessKey   string
+	MinIOSecretKey   string
+	NessieEndpoint   string
 }
 
 // Load loads the configuration from environment variables.
@@ -24,7 +28,11 @@ func Load() (*AppConfig, error) {
 	orchestratorAddr := getEnv("ORCHESTRATOR_ADDR", "localhost:8082")
 	openAIAPIKey := getEnv("OPENAI_API_KEY", "")
 	openAIEndpoint := getEnv("OPENAI_ENDPOINT", "https://api.openai.com/v1/chat/completions")
-	argoServerAddr := getEnv("ARGO_SERVER_ADDR", "localhost:2746") // Default for local dev
+	argoServerAddr := getEnv("ARGO_SERVER_ADDR", "localhost:2746")
+	minioEndpoint := getEnv("MINIO_ENDPOINT", "localhost:9000")
+	minioAccessKey := getEnv("MINIO_ACCESS_KEY", "minioadmin")
+	minioSecretKey := getEnv("MINIO_SECRET_KEY", "minioadmin")
+	nessieEndpoint := getEnv("NESSIE_ENDPOINT", "http://localhost:19120/api/v1")
 
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
@@ -39,6 +47,10 @@ func Load() (*AppConfig, error) {
 		OpenAIAPIKey:     openAIAPIKey,
 		OpenAIEndpoint:   openAIEndpoint,
 		ArgoServerAddr:   argoServerAddr,
+		MinIOEndpoint:    minioEndpoint,
+		MinIOAccessKey:   minioAccessKey,
+		MinIOSecretKey:   minioSecretKey,
+		NessieEndpoint:   nessieEndpoint,
 	}, nil
 }
 

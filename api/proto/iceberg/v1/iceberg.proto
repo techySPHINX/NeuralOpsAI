@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package iceberg.v1;
+
+option go_package = "neuralops/api/proto/iceberg/v1;icebergv1";
+
+service IcebergService {
+  rpc CreateTable(CreateTableRequest) returns (CreateTableResponse) {}
+  rpc AppendToTable(AppendToTableRequest) returns (AppendToTableResponse) {}
+  rpc OptimizeTable(OptimizeTableRequest) returns (OptimizeTableResponse) {}
+}
+
+message CreateTableRequest {
+  string table_name = 1;
+  // Schema definition would go here
+}
+
+message CreateTableResponse {
+  bool success = 1;
+}
+
+message AppendToTableRequest {
+  string table_name = 1;
+  string data_path = 2; // Path to data in MinIO
+}
+
+message AppendToTableResponse {
+  bool success = 1;
+}
+
+message OptimizeTableRequest {
+  string table_name = 1;
+}
+
+message OptimizeTableResponse {
+  bool success = 1;
+}

@@ -59,7 +59,9 @@ func (c *aIEngineServiceClient) PlanAndCodegen(ctx context.Context, in *PlanAndC
 	return out, nil
 }
 
-
+// AIEngineServiceServer is the server API for AIEngineService service.
+// All implementations must embed UnimplementedAIEngineServiceServer
+// for forward compatibility.
 type AIEngineServiceServer interface {
 	Plan(context.Context, *PlanRequest) (*PlanResponse, error)
 	PlanAndCodegen(context.Context, *PlanAndCodegenRequest) (*PlanAndCodegenResponse, error)
@@ -68,7 +70,9 @@ type AIEngineServiceServer interface {
 
 // UnimplementedAIEngineServiceServer must be embedded to have
 // forward compatible implementations.
-
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
 type UnimplementedAIEngineServiceServer struct{}
 
 func (UnimplementedAIEngineServiceServer) Plan(context.Context, *PlanRequest) (*PlanResponse, error) {

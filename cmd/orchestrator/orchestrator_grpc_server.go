@@ -3,25 +3,41 @@ package main
 import (
 	"context"
 
-	"github.com/google/uuid"
 	"neuralops/api/proto/orchestrator/v1"
+	"neuralops/internal/compiler"
+	"neuralops/pkg/clients"
 	"neuralops/pkg/logging"
 )
 
 type OrchestratorGRPCServer struct {
 	orchestratorv1.UnimplementedOrchestratorServiceServer
-	logger *logging.Logger
+	logger     *logging.Logger
+	argoClient *clients.ArgoClient
 }
 
-func NewOrchestratorGRPCServer(logger *logging.Logger) *OrchestratorGRPCServer {
-	return &OrchestratorGRPCServer{logger: logger}
+func NewOrchestratorGRPCServer(logger *logging.Logger, argoClient *clients.ArgoClient) *OrchestratorGRPCServer {
+	return &OrchestratorGRPCServer{
+		logger:     logger,
+		argoClient: argoClient,
+	}
 }
 
 func (s *OrchestratorGRPCServer) SubmitPipeline(ctx context.Context, req *orchestratorv1.SubmitPipelineRequest) (*orchestratorv1.SubmitPipelineResponse, error) {
 	s.logger.Info("Received SubmitPipeline request", "plan_id", req.Plan.Id)
 
-	// In a real implementation, we would compile the plan and submit it.
-	runID := uuid.New().String()
+	argoWF, err := compiler.CompileToArgo(req.Plan)
+	if err != nil {
+		s.logger.Error("failed to compile plan to Argo workflow", "error", err)
+		return nil, err
+	}
 
-	return &orchestratorv1.SubmitPipelineResponse{RunId: runID}, nil
+	submittedWF, err := s.argoClient.SubmitWorkflow(ctx, argoWF)
+	if err != nil {
+		s.logger.Error("failed to submit workflow to Argo", "error", err)
+		return nil, err
+	}
+
+	s.logger.Info("Successfully submitted workflow to Argo", "workflow_name", submittedWF.Name)
+
+	return &orchestratorv1.SubmitPipelineResponse{RunId: submittedWF.Name}, nil
 }

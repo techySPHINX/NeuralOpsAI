@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
 
 	"google.golang.org/grpc"
 	"neuralops/api/proto/orchestrator/v1"
+	"neuralops/pkg/clients"
 	"neuralops/pkg/config"
 	"neuralops/pkg/logging"
 	"go.uber.org/zap"
@@ -25,6 +27,11 @@ func main() {
 
 	logger.Info("Starting Orchestrator...")
 
+	argoClient, err := clients.NewArgoClient(context.Background(), cfg.ArgoServerAddr)
+	if err != nil {
+		logger.Fatal("failed to create argo client", zap.Error(err))
+	}
+
 	// Start gRPC server in a goroutine
 	go func() {
 		lis, err := net.Listen("tcp", cfg.OrchestratorAddr)
@@ -32,7 +39,7 @@ func main() {
 			logger.Fatal("failed to listen", zap.Error(err))
 		}
 		grpcServer := grpc.NewServer()
-		orchestratorv1.RegisterOrchestratorServiceServer(grpcServer, NewOrchestratorGRPCServer(logger))
+		orchestratorv1.RegisterOrchestratorServiceServer(grpcServer, NewOrchestratorGRPCServer(logger, argoClient))
 		logger.Info("gRPC server listening on", zap.String("addr", cfg.OrchestratorAddr))
 		if err := grpcServer.Serve(lis); err != nil {
 			logger.Fatal("failed to serve gRPC", zap.Error(err))

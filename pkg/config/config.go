@@ -13,6 +13,7 @@ type AppConfig struct {
 	OrchestratorAddr string
 	OpenAIAPIKey     string
 	OpenAIEndpoint   string
+	ArgoServerAddr   string
 }
 
 // Load loads the configuration from environment variables.
@@ -23,6 +24,7 @@ func Load() (*AppConfig, error) {
 	orchestratorAddr := getEnv("ORCHESTRATOR_ADDR", "localhost:8082")
 	openAIAPIKey := getEnv("OPENAI_API_KEY", "")
 	openAIEndpoint := getEnv("OPENAI_ENDPOINT", "https://api.openai.com/v1/chat/completions")
+	argoServerAddr := getEnv("ARGO_SERVER_ADDR", "localhost:2746") // Default for local dev
 
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
@@ -36,6 +38,7 @@ func Load() (*AppConfig, error) {
 		OrchestratorAddr: orchestratorAddr,
 		OpenAIAPIKey:     openAIAPIKey,
 		OpenAIEndpoint:   openAIEndpoint,
+		ArgoServerAddr:   argoServerAddr,
 	}, nil
 }
 

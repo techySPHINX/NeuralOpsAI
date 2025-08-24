@@ -7,14 +7,16 @@ import (
 
 // AppConfig holds the application configuration.
 type AppConfig struct {
-	LogLevel string
-	Port     int
+	LogLevel      string
+	Port          int
+	AIEngineAddr string
 }
 
 // Load loads the configuration from environment variables.
 func Load() (*AppConfig, error) {
 	logLevel := getEnv("LOG_LEVEL", "info")
 	portStr := getEnv("PORT", "8080")
+	aiEngineAddr := getEnv("AI_ENGINE_ADDR", "localhost:8081") // Default for local dev
 
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
@@ -22,8 +24,9 @@ func Load() (*AppConfig, error) {
 	}
 
 	return &AppConfig{
-		LogLevel: logLevel,
-		Port:     port,
+		LogLevel:      logLevel,
+		Port:          port,
+		AIEngineAddr: aiEngineAddr,
 	}, nil
 }
 

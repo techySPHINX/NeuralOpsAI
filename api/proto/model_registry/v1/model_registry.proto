@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package model_registry.v1;
+
+option go_package = "neuralops/api/proto/model_registry/v1";
+
+import "google/protobuf/timestamp.proto";
+
+service ModelRegistryService {
+  rpc RegisterModel(RegisterModelRequest) returns (RegisterModelResponse);
+  rpc GetModel(GetModelRequest) returns (GetModelResponse);
+  rpc ListModels(ListModelsRequest) returns (ListModelsResponse);
+  rpc UpdateModelStatus(UpdateModelStatusRequest) returns (UpdateModelStatusResponse);
+  rpc DeleteModel(DeleteModelRequest) returns (DeleteModelResponse);
+  rpc CreateModelVersion(CreateModelVersionRequest) returns (CreateModelVersionResponse);
+  rpc ListModelVersions(ListModelVersionsRequest) returns (ListModelVersionsResponse);
+  rpc PromoteModel(PromoteModelRequest) returns (PromoteModelResponse);
+}
+
+message Model {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string framework = 4;
+  ModelStatus status = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  map<string, string> tags = 8;
+  string current_version = 9;
+}
+
+message ModelVersion {
+  string id = 1;
+  string model_id = 2;
+  string version = 3;
+  string artifact_uri = 4;
+  map<string, double> metrics = 5;
+  map<string, string> parameters = 6;
+  google.protobuf.Timestamp created_at = 7;
+  string created_by = 8;
+  ModelStage stage = 9;
+}
+
+enum ModelStatus {
+  MODEL_STATUS_UNSPECIFIED = 0;
+  MODEL_STATUS_ACTIVE = 1;
+  MODEL_STATUS_INACTIVE = 2;
+  MODEL_STATUS_ARCHIVED = 3;
+}
+
+enum ModelStage {
+  MODEL_STAGE_UNSPECIFIED = 0;
+  MODEL_STAGE_DEVELOPMENT = 1;
+  MODEL_STAGE_STAGING = 2;
+  MODEL_STAGE_PRODUCTION = 3;
+  MODEL_STAGE_ARCHIVED = 4;
+}
+
+message RegisterModelRequest {
+  string name = 1;
+  string description = 2;
+  string framework = 3;
+  map<string, string> tags = 4;
+}
+
+message RegisterModelResponse {
+  Model model = 1;
+}
+
+message GetModelRequest {
+  string id = 1;
+}
+
+message GetModelResponse {
+  Model model = 1;
+}
+
+message ListModelsRequest {
+  int32 page_size = 1;
+  string page_token = 2;
+  string filter = 3;
+}
+
+message ListModelsResponse {
+  repeated Model models = 1;
+  string next_page_token = 2;
+  int32 total_count = 3;
+}
+
+message UpdateModelStatusRequest {
+  string id = 1;
+  ModelStatus status = 2;
+}
+
+message UpdateModelStatusResponse {
+  Model model = 1;
+}
+
+message DeleteModelRequest {
+  string id = 1;
+}
+
+message DeleteModelResponse {
+  bool success = 1;
+}
+
+message CreateModelVersionRequest {
+  string model_id = 1;
+  string version = 2;
+  string artifact_uri = 3;
+  map<string, double> metrics = 4;
+  map<string, string> parameters = 5;
+  ModelStage stage = 6;
+}
+
+message CreateModelVersionResponse {
+  ModelVersion version = 1;
+}
+
+message ListModelVersionsRequest {
+  string model_id = 1;
+  int32 page_size = 2;
+  string page_token = 3;
+}
+
+message ListModelVersionsResponse {
+  repeated ModelVersion versions = 1;
+  string next_page_token = 2;
+}
+
+message PromoteModelRequest {
+  string model_id = 1;
+  string version_id = 2;
+  ModelStage target_stage = 3;
+}
+
+message PromoteModelResponse {
+  ModelVersion version = 1;
+}

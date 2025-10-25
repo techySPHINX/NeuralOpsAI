@@ -1,0 +1,47 @@
+# Build stage for dashboard
+FROM node:18-alpine AS dashboard-build
+WORKDIR /app
+COPY web/dashboard/package*.json ./
+RUN npm ci
+COPY web/dashboard/ ./
+RUN npm run build
+
+# Build stage for Go services
+FROM golang:1.24-alpine AS go-build
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+
+# Build all services
+RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/api-gateway ./cmd/api-gateway
+RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/orchestrator ./cmd/orchestrator
+RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/ai-engine ./cmd/ai-engine
+RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/iceberg-manager ./cmd/iceberg-manager
+RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/model-registry ./cmd/model-registry
+RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/automl-service ./cmd/automl-service
+
+# Runtime stage for API Gateway (serves both API and dashboard)
+FROM alpine:latest AS api-gateway
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+COPY --from=go-build /bin/api-gateway .
+COPY --from=dashboard-build /app/dist /root/static
+EXPOSE 8080
+CMD ["./api-gateway"]
+
+# Runtime stage for Model Registry
+FROM alpine:latest AS model-registry
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+COPY --from=go-build /bin/model-registry .
+EXPOSE 8084
+CMD ["./model-registry"]
+
+# Runtime stage for AutoML Service
+FROM alpine:latest AS automl-service
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+COPY --from=go-build /bin/automl-service .
+EXPOSE 8085
+CMD ["./automl-service"]
